@@ -1,0 +1,73 @@
+name: wso2gitops
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+
+env:
+  PROJECT_DIR: .                                 
+  IMAGE: ghcr.io/${{ github.repository_owner }}/wso2vpk
+  MI_CARBONAPPS: ${WSO2_SERVER_HOME}/repository/deployment/server/carbonapps
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ---------- Build the CAR file ----------
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Build CAR with Maven
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: mvn -B clean install -DskipTests
+
+      # ---------- Copy CAR into the Docker build context ----------
+      - name: Copy CAR to carbonapps folder
+        run: |
+          mkdir -p carbonapps
+          find "${PROJECT_DIR}" -path "*/target/*.car" -not -path "./carbonapps/*" -exec cp {} carbonapps/ \;
+          echo "CAR files to deploy:"
+          ls -l carbonapps
+          if [ -z "$(ls -A carbonapps/*.car 2>/dev/null)" ]; then
+            echo "ERROR: No .car file found. Check the Maven build output."
+            exit 1
+          fi
+
+      # ---------- Build and push image ----------
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          pull: true
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:3.0.0
+            ${{ env.IMAGE }}:${{ github.sha }}
+
+      # ---------- Verify the CAR is inside the image ----------
+      - name: Verify CAR in image
+        run: |
+          docker run --rm --entrypoint ls "${IMAGE}:${GITHUB_SHA}" -l "${MI_CARBONAPPS}"
