@@ -7,7 +7,7 @@ on:
 
 
 env:
-  PROJECT_DIR: .                                 
+  PROJECT_DIR: ItemCatalogIntegration                                 
   IMAGE: ghcr.io/${{ github.repository_owner }}/wso2vpk
   MI_CARBONAPPS: ${WSO2_SERVER_HOME}/repository/deployment/server/carbonapps
 
