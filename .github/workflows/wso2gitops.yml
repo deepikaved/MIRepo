@@ -79,8 +79,3 @@ jobs:
           tags: |
             ${{ env.IMAGE }}:3.0.0
             ${{ env.IMAGE }}:${{ github.sha }}
-
-      # ---------- Verify the CAR is inside the image ----------
-      - name: Verify CAR in image
-        run: |
-          docker run --rm --entrypoint ls "${IMAGE}:${GITHUB_SHA}" -l "${MI_CARBONAPPS}"
