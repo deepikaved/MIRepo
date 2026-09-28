@@ -10,8 +10,9 @@ env:
   PROJECT_DIR1: ItemCatalogIntegration 
   PROJECT_DIR2: ItemCatalogIntegrationService 
   IMAGE: ghcr.io/${{ github.repository_owner }}/wso2vpk
-  MI_CARBONAPPS: ${WSO2_SERVER_HOME}/repository/deployment/server/carbonapps
-
+  MI_CARBONAPPS: ${MI_HOME}/repository/deployment/server/carbonapps
+  MI_BASE_IMAGE: wso2/wso2mi:4.6.0-alpine
+  MI_HOME: /home/wso2carbon/wso2mi-4.6.0
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
