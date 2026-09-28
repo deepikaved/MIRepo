@@ -7,7 +7,8 @@ on:
 
 
 env:
-  PROJECT_DIR: ItemCatalogIntegration                                 
+  PROJECT_DIR1: ItemCatalogIntegration 
+  PROJECT_DIR2: ItemCatalogIntegrationService 
   IMAGE: ghcr.io/${{ github.repository_owner }}/wso2vpk
   MI_CARBONAPPS: ${WSO2_SERVER_HOME}/repository/deployment/server/carbonapps
 
@@ -29,22 +30,34 @@ jobs:
           java-version: "17"
           cache: maven
 
-      - name: Build CAR with Maven
-        working-directory: ${{ env.PROJECT_DIR }}
+      - name: Build CAR1 with Maven
+        working-directory: ${{ env.PROJECT_DIR1 }}
+        run: mvn -B clean install -DskipTests
+      - name: Build CAR2 with Maven
+        working-directory: ${{ env.PROJECT_DIR2 }}
         run: mvn -B clean install -DskipTests
 
       # ---------- Copy CAR into the Docker build context ----------
-      - name: Copy CAR to carbonapps folder
+      - name: Copy CAR1 to carbonapps folder
         run: |
           mkdir -p carbonapps
-          find "${PROJECT_DIR}" -path "*/target/*.car" -not -path "./carbonapps/*" -exec cp {} carbonapps/ \;
+          find "${PROJECT_DIR1}" -path "*/target/*.car" -not -path "./carbonapps/*" -exec cp {} carbonapps/ \;
           echo "CAR files to deploy:"
           ls -l carbonapps
           if [ -z "$(ls -A carbonapps/*.car 2>/dev/null)" ]; then
             echo "ERROR: No .car file found. Check the Maven build output."
             exit 1
           fi
-
+      - name: Copy CAR2 to carbonapps folder
+        run: |
+          mkdir -p carbonapps
+          find "${PROJECT_DIR2}" -path "*/target/*.car" -not -path "./carbonapps/*" -exec cp {} carbonapps/ \;
+          echo "CAR files to deploy:"
+          ls -l carbonapps
+          if [ -z "$(ls -A carbonapps/*.car 2>/dev/null)" ]; then
+            echo "ERROR: No .car file found. Check the Maven build output."
+            exit 1
+          fi
       # ---------- Build and push image ----------
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
