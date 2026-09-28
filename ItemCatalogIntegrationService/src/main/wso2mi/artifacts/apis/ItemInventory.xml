@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/iteminventory" name="ItemInventory" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="GET" uri-template="/">
+        <inSequence>
+            <log category="INFO" logMessageID="true" logFullPayload="true" description="Logging Request Payload">
+                <message>Request Payload ------------</message>
+            </log>
+            <property name="uri.var.id" scope="default" type="STRING" expression="${params.queryParams.id}" description="Query Paramters  id mapping to URI VAR "/>
+            <property name="Accept-Encoding" scope="transport" action="remove" description="Removing Transport Header - Accept Encoding"/>
+            <call description="Calling Item Inventory EndPoint">
+                <endpoint key="ItemInventoryEP"/>
+            </call>
+            <log category="INFO" logMessageID="true" logFullPayload="true" description="Logging Resposne">
+                <message>Response Received -------${payload}</message>
+            </log>
+            <respond description="Reply to the Service Consumer"/>
+        </inSequence>
+        <faultSequence>
+        </faultSequence>
+    </resource>
+</api>

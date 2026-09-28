@@ -7,17 +7,10 @@
             </log>
             <property name="messageType" scope="axis2" type="STRING" description="Adding Content-Type" value="application/json"/>
             <property name="Accept-Encoding" scope="transport" action="remove" description="Removing Accept-Encoding from Header"/>
-            <property name="query.param.id" scope="default" type="STRING" expression="${params.queryParams.id}" description="Setting the Filter Parameter"/>
-            <http.get configKey="ItemCatalogEndpoint">
-                <relativePath>?id=${properties.synapse.["query.param.id"]}</relativePath>
-                <headers>[]</headers>
-                <forceScAccepted>false</forceScAccepted>
-                <disableChunking>false</disableChunking>
-                <forceHttp10>false</forceHttp10>
-                <noKeepAlive>false</noKeepAlive>
-                <responseVariable>http_get_1</responseVariable>
-                <overwriteBody>true</overwriteBody>
-            </http.get>
+            <property name="uri.var.id" scope="default" type="STRING" expression="${params.queryParams.id}" description="Setting the Filter Parameter"/>
+            <call description="ItemCatalog Endpoint">
+                <endpoint key="ItemCatalogEP"/>
+            </call>
 
             <log category="INFO" logMessageID="true" logFullPayload="true" description="Printing Response Payload">
                 <message>Response Payload ----------- ${payload}</message>
@@ -28,6 +21,14 @@
             <log category="ERROR" logMessageID="true" logFullPayload="true" description="Logging Exception">
                 <message>Exception Logger -----</message>
             </log>
+            <payloadFactory description="Constructing Error Response" media-type="json" template-type="default">
+                <format>{
+                    "Response": {
+                    "ErrorCode" :500,
+                    "Error Description": "Failed in Processing the message: Please contact Administrator"
+                    }
+                    }</format>
+            </payloadFactory>
             <respond description="Reply"/>
         </faultSequence>
     </resource>
