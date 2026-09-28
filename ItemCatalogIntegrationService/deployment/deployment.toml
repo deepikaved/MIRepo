@@ -1,6 +1,6 @@
 [server]
 hostname = "localhost"
-# offset  = 10
+ offset  = 5
 
 [user_store]
 type = "read_only_ldap"
