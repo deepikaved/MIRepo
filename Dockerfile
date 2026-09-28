@@ -4,3 +4,5 @@ FROM wso2/wso2mi:4.6.0-alpine
 #COPY deployment.toml /home/wso2carbon/wso2mi-4.6.0/conf/ 
 COPY ItemCatalogIntegration/target/*.car ${MI_HOME}/repository/deployment/server/carbonapps/
 COPY ItemCatalogIntegrationService/target/*.car ${MI_HOME}/repository/deployment/server/carbonapps/
+
+
