@@ -10,9 +10,6 @@
             <call description="Calling Item Inventory EndPoint">
                 <endpoint key="ItemInventoryEP"/>
             </call>
-            <log category="INFO" logMessageID="true" logFullPayload="true" description="Logger for Test Build">
-                <message>Logger for testing build</message>
-            </log>
             <log category="INFO" logMessageID="true" logFullPayload="true" description="Logging Resposne">
                 <message>Response Received -------${payload}</message>
             </log>
